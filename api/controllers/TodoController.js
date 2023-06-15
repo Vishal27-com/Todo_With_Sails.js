@@ -27,10 +27,8 @@ const updateTodo=async (req,res)=>{
 try {
     const data=req.body;
     const id=req.params.id;
-   await Todo.update(
-    {_id:id},data
-   );
-   return res.send("Updated");
+    await Todo.update({_id:id}).set(data);
+    return res.send("Updated");
 } catch (error) {
     res.send(error.message)
 }

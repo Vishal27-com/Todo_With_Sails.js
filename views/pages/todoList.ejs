@@ -5,12 +5,18 @@
 </head>
 <style>
     form{
-        width: 30%;
+        width: 25%;
         display: flex;
+        background: teal;
         flex-direction: column;
         justify-content: space-between;
         gap: 15px;
         align-items: center;
+        padding: 10px;
+    }
+    input,textarea{
+        width: 100%;
+        padding: 3px;
     }
     #submit,button{
         padding: 5px 10px;
@@ -25,6 +31,16 @@
     gap: 15px;
     align-items: center;
     position: relative;
+   }
+   .box{
+    display: flex;
+    align-items: center;
+    gap:15px
+   }
+   .status{
+      height: 25px;
+      width: 25px;
+      border-radius: 100%;
    }
   
 </style>
@@ -60,9 +76,11 @@
             let li=document.createElement("li");
             let title=document.createElement("p");
             title.innerText=item.title
+            let div=document.createElement("div");
+            div.className="box"
             let status=document.createElement("button");
-            status.innerText=item.completed?"Done":"Pending"
-            status.style.backgroundColor=item.completed?"green":"yellow"
+            status.className="status";
+            status.style.backgroundColor=item.completed?"green":"yellow";
             status.addEventListener("click",()=>{
                 toggleStatus(item.id,!item.completed)
             })
@@ -72,7 +90,8 @@
                 deleteTodo(item.id)
             })
             del.style.backgroundColor="red"
-            li.append(title,status,del)
+            div.append(status,del)
+            li.append(title,div)
             list.append(li)
         })
     }
@@ -85,7 +104,7 @@
    async function toggleStatus(id,status){
     await fetch(`http://localhost:1337/updateTodo/${id}`,{
         method:"PATCH",
-        body:{completed:status}
+        body:JSON.stringify({completed:status})
     });
     getData()
    }
