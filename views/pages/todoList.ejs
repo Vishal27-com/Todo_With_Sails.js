@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Todo List</title>
+</head>
+<style>
+    form{
+        width: 30%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 15px;
+        align-items: center;
+    }
+    #submit,button{
+        padding: 5px 10px;
+        background-color: rgb(39, 254, 39);
+        font-weight: 600;
+        cursor:pointer
+    }
+   li{
+    width: 30%;
+    display:flex;
+    justify-content: space-between;
+    gap: 15px;
+    align-items: center;
+    position: relative;
+   }
+  
+</style>
+<body>
+  <h1>Todo List</h1>
+  <form id="form">
+      <input type="text" id="title">
+      <textarea id="desc"></textarea>
+      <input type="submit" id="submit">
+ </form>
+      <ul id='list'></ul>
+</body>
+<script>
+    let form=document.getElementById("form")
+    let list=document.getElementById("list");
+    const submitHandler=async (event)=>{
+    event.preventDefault();
+    let todo={
+        title:form.title.value,
+        description:form.desc.value
+    }
+    await fetch("http://localhost:1337/addTodo",{
+        method:"POST",
+        body:JSON.stringify(todo)
+    });
+   
+    getData();
+    }
+    form.addEventListener("submit",submitHandler);
+    const display=(data)=>{
+        list.innerHTML=''
+        data.forEach((item)=>{
+            let li=document.createElement("li");
+            let title=document.createElement("p");
+            title.innerText=item.title
+            let status=document.createElement("button");
+            status.innerText=item.completed?"Done":"Pending"
+            status.style.backgroundColor=item.completed?"green":"yellow"
+            status.addEventListener("click",()=>{
+                toggleStatus(item.id,!item.completed)
+            })
+            let del=document.createElement("button");
+            del.innerText="Delete"
+            del.addEventListener("click",()=>{
+                deleteTodo(item.id)
+            })
+            del.style.backgroundColor="red"
+            li.append(title,status,del)
+            list.append(li)
+        })
+    }
+    const getData=async ()=>{
+    let res=await fetch("http://localhost:1337/getTodo");
+    let data=await res.json();
+    display(data);
+    }
+    getData()
+   async function toggleStatus(id,status){
+    await fetch(`http://localhost:1337/updateTodo/${id}`,{
+        method:"PATCH",
+        body:{completed:status}
+    });
+    getData()
+   }
+   async function deleteTodo(id){
+    await fetch(`http://localhost:1337/deleteTodo/${id}`,{
+        method:"DELETE"
+    });
+    getData()
+   }
+
+</script>
+</html>
